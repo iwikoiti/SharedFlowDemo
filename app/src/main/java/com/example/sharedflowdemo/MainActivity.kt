@@ -18,7 +18,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sharedflowdemo.ui.theme.SharedFlowDemoTheme
 import kotlinx.coroutines.flow.SharedFlow
@@ -53,14 +55,18 @@ fun MainScreen(modifier: Modifier = Modifier, sharedFlow: SharedFlow<Int>) {
 
     //Запускает корутину 1 раз, при первом запуске Composable
     LaunchedEffect(key1 = Unit) {
-        //Прослушивание потока (значений) из ViewModel
-        sharedFlow.collect {
-            //Каждое новое значение добавляется в список
-            messages.add(it)
+        //Данные собираются пока приложение активно
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+            //Прослушивание потока (значений) из ViewModel
+            sharedFlow.collect {
+                //Каждое новое значение добавляется в список
+                println("Collecting $it")
+                messages.add(it)
+            }
         }
     }
 
-    //При изменении состояния перересовывается LazyColumn из-за списка mutableStateList
+    //При изменении состояния пересовывается LazyColumn из-за списка mutableStateList
     LazyColumn(modifier = modifier) {
         items(messages) {
             Text(

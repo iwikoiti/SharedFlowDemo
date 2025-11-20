@@ -23,6 +23,7 @@ class DemoViewModel: ViewModel() {
         viewModelScope.launch {
             for (i in 1..1000) {
                 delay(2000)
+                println("Emmiting $i")
                 _sharedFlow.emit(i)
             }
         }
